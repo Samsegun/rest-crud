@@ -2,9 +2,9 @@ package com.samsegun.restdemo.rest;
 
 import com.samsegun.restdemo.entity.Employee;
 import com.samsegun.restdemo.service.EmployeeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class EmployeeRestController {
 
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
     public EmployeeRestController(EmployeeService employeeService) {
         this.employeeService = employeeService;
@@ -25,9 +25,47 @@ public class EmployeeRestController {
     }
 
     @GetMapping("/employees")
-    public List<Employee> employees() {
+    public ResponseEntity<List<Employee>> employees() {
         List<Employee> employees = employeeService.findAll();
 
-        return employees;
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(employees);
+    }
+
+    @GetMapping("/employees/{employeeId}")
+    public ResponseEntity<Employee> employee(@PathVariable Integer employeeId) {
+        Employee employee = employeeService.findEmployee(employeeId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(employee);
+    }
+
+    @PostMapping("/employees")
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        Employee newEmployee = employeeService.save(employee);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(newEmployee);
+    }
+
+    @PutMapping("/employees")
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
+        Employee newEmployee = employeeService.save(employee);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(newEmployee);
+    }
+
+    @DeleteMapping("/employees/{employeeId}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable Integer employeeId) {
+        employeeService.deleteEmployee(employeeId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Deleted Employee id: " + employeeId);
     }
 }
